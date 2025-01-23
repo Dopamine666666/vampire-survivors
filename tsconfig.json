@@ -4,6 +4,21 @@
 
   /* Add your custom configuration here. */
   "compilerOptions": {
-    "strict": false
-  }
+    "strict": false,
+    "target": "ES2017",
+    "noImplicitAny": false,
+    "paths": {
+      "node:path": ["./node_modules/@types/node/path.d.ts"],
+      "node:globals": ["./node_modules/@types/node/globals.d.ts"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "library",
+    "local",
+    "temp",
+    "build",
+    "settings",
+    "extensions"
+  ]
 }

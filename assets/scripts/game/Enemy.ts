@@ -1,6 +1,7 @@
 import { _decorator, Component, Node, UITransform, v3, Vec3 } from 'cc';
 import { Hero } from './Hero';
 import { GetLimitPos, SetPosInLimit } from '../CommonFunc';
+import GameTsCfg from '../../resources/data/client/GameTsCfg';
 const { ccclass, property } = _decorator;
 const SPEED = 200;
 const FRAME_RATE = 60;
@@ -9,7 +10,7 @@ interface EnemyData {
     hp: number,
     power: number,
     cooling: number,
-    skill?: string,
+    skills?: string[],
 }
 
 @ccclass('Enemy')
@@ -35,8 +36,8 @@ export class Enemy extends Component {
 
     private limitPos: {xMin: number, xMax: number, yMin: number, yMax: number};
 
-    static createEnemy() {
-
+    static createEnemy(enemyId: string) {
+        const { hp,  } = GameTsCfg.EnemyConfig[enemyId];
     }
 
     initState(data: EnemyData, mapNode: Node) {

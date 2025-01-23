@@ -1,0 +1,51 @@
+{
+  "name": "excel-killer-plus",
+  "version": "0.6.3",
+  "description": "excel-killer",
+  "author": "cc-plugin",
+  "main": "./main.js",
+  "package_version": 2,
+  "contributions": {
+    "builder": "./builder.js",
+    "messages": {
+      "onBuilder": {
+        "methods": [
+          "onBuilder"
+        ]
+      },
+      "main-recv_entry": {
+        "methods": [
+          "main.recv_entry"
+        ]
+      },
+      "showPanel": {
+        "methods": [
+          "showPanel"
+        ]
+      }
+    },
+    "menu": [
+      {
+        "path": "i18n:menu.extension",
+        "label": "i18n:excel-killer-plus.title",
+        "message": "showPanel"
+      }
+    ],
+    "shortcuts": []
+  },
+  "editor": ">=3.0.0",
+  "panels": {
+    "main": {
+      "main": "panel/main_panel.js",
+      "title": "excel-killer",
+      "type": "dockable",
+      "size": {
+        "width": 500,
+        "height": 400,
+        "min-width": 50,
+        "min-height": 400
+      }
+    }
+  },
+  "_storeId": "934f7438d6e2625a7cfd0d3b5080bdfb"
+}

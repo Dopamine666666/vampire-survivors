@@ -1,7 +1,8 @@
-import { _decorator, Camera, Component, Node, UITransform, v3, Vec3, view } from 'cc';
+import { _decorator, Camera, Component, instantiate, loader, Node, Prefab, resources, UITransform, v3, Vec3, view } from 'cc';
 import { Enemy } from './Enemy';
 import { Hero } from './Hero';
 import { GetSelfBoundingBox } from '../CommonFunc';
+import { EventManager } from '../manager/EventManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('Field')
@@ -24,12 +25,18 @@ export class Field extends Component {
     @property({ type: Hero })
     hero: Hero = null;
 
-    // private enemies: Enemy[] = [];
-    // private mine: Hero = null;
+    private enemies: Enemy[] = [];
+    private mine: Hero = null;
 
     protected onLoad(): void {
         this.initState();
         this.initMapLimit();
+        this.onEvent();
+    }
+
+    onEvent() {
+        EventManager.On('createEnemy', this.createEnemy, this);
+        EventManager.On('createBullet', this.createBullet, this);
     }
 
     initState() {
@@ -37,13 +44,6 @@ export class Field extends Component {
             hp: 100,
             power: 10,
         }, this.fieldMap);
-        this.enemy.initState({
-            hp: 20,
-            power: 5,
-            cooling: 500,
-        }, this.fieldMap);
-        this.enemy.chaseTarget = this.hero.node;
-        this.enemy.attackTarget = this.hero;
     }
 
     private mapMinX: number = 0;
@@ -61,6 +61,31 @@ export class Field extends Component {
         this.mapMaxX = xMax - cameraWidth / 2;
         this.mapMinY = yMin + cameraHeight / 2;
         this.mapMaxY = yMax - cameraHeight / 2;
+    }
+
+    private createEnemy(enemyId: keyof typeof GameTsCfg.EnemyConfig, pos: Vec3) {
+        const { hp, power, cooling, skills } = GameTsCfg.EnemyConfig[enemyId];
+        // let enemy: Node = null;
+        resources.load(`prefab/Enemy`, Prefab, (err, res) => {
+            if(err) {
+                console.log(err);
+                return;
+            }
+            const node = instantiate(res);
+            const enemy = node.getComponent(Enemy);
+            enemy.initState({  hp, power, cooling, skills }, this.fieldMap);
+            enemy.chaseTarget = this.hero.node;
+            enemy.attackTarget = this.hero;
+            node.active = false;
+            node.setParent(this.unitLayer);
+            node.setWorldPosition(pos);
+            this.enemies.push(enemy);
+            node.active = true;
+        })
+    }
+
+    private createBullet() {
+
     }
 
     updateCamera() {

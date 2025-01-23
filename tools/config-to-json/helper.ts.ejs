@@ -1,0 +1,26 @@
+<%_
+const underlineToHump = string => string.replace(/\_(\w)/g, (_, char) => char.toUpperCase());
+const humpToUnderline = string => string.replace(/([A-Z])/g, '_$1').toLowerCase();
+
+for (let key in intfs) { -%>
+export interface <%- underlineToHump('I_'+key) %> {
+<%_ for (let param in intfs[key]) { -%>
+    /** <%- annos[key][param] %> */
+    readonly <%- param %>: <%- intfs[key][param] %>;
+<%_ } -%>
+}
+<%_ }
+-%>
+
+export interface IGameData {
+    readonly version: number;
+    readonly config: IConfig;
+<%_ for (let key in intfs) { if (key == 'config') continue; -%>
+    readonly <%- key %>: {[_id: string]: <%- underlineToHump('I_'+key) %>};
+<%_ } -%>
+}
+
+<%_ for (let type in list) { if (type == 'version') continue; -%>
+export type <%- underlineToHump('T_' + type + '_key') %> = <%- '\'' + Object.keys(list[type]).join('\' | \'') + '\'' %>;
+<%_ } -%>
+

@@ -3,5 +3,11 @@
   "uuid": "159964b2-b1e0-4b2c-a719-d129f74845a5",
   "creator": {
     "version": "3.8.3"
+  },
+  "dependencies": {
+    "@types/node": "^22.10.5",
+    "ejs": "^3.1.10",
+    "fs-extra": "^11.3.0",
+    "node-xlsx": "^0.24.0"
   }
 }
