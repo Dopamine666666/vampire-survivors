@@ -5,9 +5,13 @@
     "version": "3.8.3"
   },
   "dependencies": {
-    "@types/node": "^22.10.5",
-    "ejs": "^3.1.10",
-    "fs-extra": "^11.3.0",
-    "node-xlsx": "^0.24.0"
+    "ejs": "^3.1.9",
+    "fs-extra": "^11.2.0",
+    "node-xlsx": "^0.23.0"
+  },
+  "devDependencies": {
+    "@types/ejs": "^3.1.5",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.11.20"
   }
 }

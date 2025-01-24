@@ -23,4 +23,3 @@ export interface IGameData {
 <%_ for (let type in list) { if (type == 'version') continue; -%>
 export type <%- underlineToHump('T_' + type + '_key') %> = <%- '\'' + Object.keys(list[type]).join('\' | \'') + '\'' %>;
 <%_ } -%>
-

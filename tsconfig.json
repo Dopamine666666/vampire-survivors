@@ -8,9 +8,9 @@
     "target": "ES2017",
     "noImplicitAny": false,
     "paths": {
-      "node:path": ["./node_modules/@types/node/path.d.ts"],
-      "node:globals": ["./node_modules/@types/node/globals.d.ts"]
-    }
+      "node:path": ["./node_modules/@types/node/path.d.ts"]
+    },
+    "module": "CommonJS"
   },
   "exclude": [
     "node_modules",
