@@ -1,0 +1,56 @@
+{
+    "$schema": "./@types/schema/package/index.json",
+    "package_version": 2,
+    "name": "bike-game-data-editor",
+    "version": "1.0.0",
+    "author": "gxt",
+    "editor": ">=3.8.2",
+    "scripts": {
+        "preinstall": "node ./scripts/preinstall.js",
+        "build": "tsc"
+    },
+    "description": "i18n:bike-game-data-editor.description",
+    "main": "./dist/main.js",
+    "dependencies": {
+        "ejs": "^3.1.10",
+        "fs-extra": "^10.0.0",
+        "node-xlsx": "^0.24.0",
+        "typescript": "^5.4.5",
+        "vue": "^3.1.4"
+    },
+    "devDependencies": {
+        "@cocos/creator-types": "^3.8.2",
+        "@types/ejs": "^3.1.5",
+        "@types/fs-extra": "^9.0.5",
+        "@types/node": "^18.17.1"
+    },
+    "panels": {
+        "default": {
+            "title": "i18n:bike-game-data-editor.title",
+            "type": "dockable",
+            "main": "dist/panels/default",
+            "size": {
+                "min-width": 1024,
+                "min-height": 600,
+                "width": 1280,
+                "height": 800
+            }
+        }
+    },
+    "contributions": {
+        "menu": [
+            {
+                "path": "i18n:bike-game-data-editor.menu",
+                "label": "i18n:bike-game-data-editor.title",
+                "message": "open-panel"
+            }
+        ],
+        "messages": {
+            "open-panel": {
+                "methods": [
+                    "openPanel"
+                ]
+            }
+        }
+    }
+}

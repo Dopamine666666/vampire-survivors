@@ -1,1 +1,23 @@
-{"version":1,"enemy":{"enemy_1":{},"undefined":250,"enemy_2":{},"enemy_3":{},"enemy_4":{}},"enemy_skill":{"enemy_skill_1":{},"undefined":2000,"enemy_skill_2":{},"enemy_skill_3":{}},"hero":{"hero_1":{},"undefined":[],"hero_2":{},"hero_3":{}},"hero_skill":{"hero_skill_1":{},"undefined":4000,"hero_skill_2":{},"hero_skill_3":{},"hero_skill_4":{}}}
+{
+  "config": {
+    "frame_rate": 60,
+    "max_speed": 300,
+    "init_heroes": [
+      "hero_1",
+      "hero_2"
+    ],
+    "lock_hero": "hero_3"
+  },
+  "hero": {
+    "hero_1": {
+      "_id": "hero_1",
+      "power": 10,
+      "speed": 200
+    },
+    "hero_2": {
+      "_id": "hero_2",
+      "power": 15,
+      "speed": 180
+    }
+  }
+}

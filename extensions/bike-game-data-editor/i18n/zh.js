@@ -1,0 +1,1 @@
+"use strict";module.exports={description:"用于游戏配置表的结构生成，内容编辑以及导入导出EXCEL文件",title:"彼刻配置表工具",menu:"彼刻工具集"};

@@ -1,0 +1,1 @@
+"use strict";module.exports={description:"Create, Edit, Import or Export Game Setting Files",title: "BiKe Game Setting Manager",menu: "Bike Tools"};

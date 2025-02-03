@@ -1,0 +1,76 @@
+<ui-section class="type-parser config" v-if="!!parser" whole :style="{width: '100%', height: !parser.isArray && !parser.isHash && !parser.isGrid && !parser.isText && (!parser.isAsset || !['ImageAsset', ''].includes(parser.type)) ? '0px' : 'auto'}">
+    <div slot="header" class="header">
+        <ui-label>{{parser.TypeMemo || parser.TypeKey}}</ui-label>
+        <div v-if="!parser.isArray && !parser.isHash">
+            <ui-num-input v-if="parser.isNumber" :value="parsedVal" style="flex: 1;" @change="setVal(parser.TypeKey, +$event.target.value)"></ui-num-input>
+            <ui-input v-if="parser.isString || parser.isIgnore" :value="parsedVal" style="flex: 1;" @change="setVal(parser.TypeKey, $event.target.value)"></ui-input>
+            <ui-select v-if="parser.isQuot" :value="parsedVal" style="flex: 1;" @change="setVal(parser.TypeKey, $event.target.value)">
+                <option value="">请选择</option>
+                <option v-for="key in ksItems" :value="key">{{ ks.keys[parser.type][key] || key }}</option>
+            </ui-select>
+            <ui-select v-if="parser.isEnum" :value="parsedVal" style="flex: 1;" @change="setVal(parser.TypeKey, $event.target.value)">
+                <option value="">请选择</option>
+                <option v-for="key in parser.enumKeys" :value="key.split('@').shift()">{{ key.split('@').pop()}}</option>
+            </ui-select>
+            <ui-input v-if="parser.isEnum && parser.isAutoEnum" :value="parsedVal" style="flex: 1;" @change="setVal(parser.TypeKey, $event.target.value)"></ui-input>
+            <ui-asset v-if="parser.isAsset" :droppable="'cc.' + parser.type" :value="parsedVal" @change="setVal(parser.TypeKey, $event.target.value)" style="flex: 1;"></ui-asset>
+            <ui-color v-if="parser.isColor" :value="parsedVal" style="flex: 1;" @change="setVal(parser.TypeKey, $event.target.value)"></ui-color>
+        </div>
+    </div>
+    <div v-if="parser.isGrid" style="justify-content: center;display: flex;">
+        <div class=".grid-holder" :style="{width: 40 * parser.gridSize[0] + 'px',height: 40 * parser.gridSize[1] + 'px',border: '2px solid white', borderRadius: '4px', display: 'flex', flexDirection: 'row', flexWrap: 'wrap', padding: '0px 2px 2px 0px'}">
+            <div v-for="idx in parser.gridSize[0] * parser.gridSize[1]" :style="{width: '36px',height: '36px',border: '1px solid white', marginLeft: '2px',marginTop: '2px', backgroundColor: !(parsedVal & (1 << parser.gridSize[0] * parser.gridSize[1] - idx)) ? 'transparent' : 'green'}" @click="setVal(parser.TypeKey, 0, parser.gridSize[0] * parser.gridSize[1] - idx)">
+                
+            </div>
+        </div>
+    </div>
+    
+    <div v-if="parser.isText" style="justify-content: center;display: flex;">
+        <ui-textarea v-if="parser.isText" :value="parsedVal"  style="flex: 1;" @change="setVal(parser.TypeKey, $event.target.value)"></ui-textarea>
+    </div>
+
+    <div v-if="parser.isAsset && parser.type=='ImageAsset'" style="justify-content: center;display: flex;">
+        <ui-image readonly :value="parsedVal"></ui-image>
+    </div>
+    <div v-if="parser.isArray">
+        <section v-for="(val, idx) in parsedVal" style="display: flex;flex-direction: row;align-items: center;justify-content: flex-start;">
+            <ui-label style="width:30px;text-align: center;">{{ idx }}</ui-label>
+            
+            <section style="display: flex;flex-direction: column;flex: 1 1 auto;">
+                <value-modifier v-if="parser.isHash" v-for="psr in parser.hashKeyTypeParsers" :parser="psr" :ks="ks" :mode="mode+1" :val="val"></value-modifier>
+            </section>
+
+            <ui-num-input v-if="parser.isNumber" class="list-item" :value="val" @change="setVal(parser.TypeKey, +$event.target.value, idx)"></ui-num-input>
+            <ui-input v-if="parser.isString || parser.isIgnore" class="list-item" :value="val"  @change="setVal(parser.TypeKey, $event.target.value, idx)"></ui-input>
+
+            <ui-select v-if="parser.isQuot" :value="val" class="list-item" @change="setVal(parser.TypeKey, $event.target.value, idx)">
+                <option value="">请选择</option>
+                <option v-for="key in ksItems" :value="key">{{ ks.keys[parser.type][key] || key }}</option>
+            </ui-select>
+
+            <ui-select v-if="parser.isEnum" :value="val" class="list-item" @change="setVal(parser.TypeKey, $event.target.value, idx)">
+                <option value="">请选择</option>
+                <option v-for="key in parser.enumKeys" :value="key.split('@').shift()">{{ key.split('@').pop() }}</option>
+            </ui-select>
+
+            <ui-label v-if="parser.isEnum && parser.isAutoEnum">|</ui-label>
+            <ui-input v-if="parser.isEnum && parser.isAutoEnum" :value="val" class="list-item" @change="setVal(parser.TypeKey, $event.target.value, idx)"></ui-input>
+
+            <ui-color v-if="parser.isColor" :val="val" class="list-item" @change="setVal(parser.TypeKey, $event.target.value, idx)"></ui-color>
+            <ui-button type="icon" style="margin-left: 2px;" @click="newArrayItem(idx)">
+                <ui-icon value="add"></ui-icon>
+            </ui-button>
+            <ui-button type="icon" style="margin-left: 2px;" v-if="parsedVal.length > 0" @click="removeArrayItem(idx)">
+                <ui-icon value="reduce"></ui-icon>
+            </ui-button>
+        </section>
+        <section v-if="parsedVal.length == 0" style="display: flex;flex-direction: row;">
+            <ui-button type="icon" style="margin-left: 2px;flex: 1 1 auto;margin-top: 5px;" @click="newArrayItem(-1)">
+                <ui-icon value="add"></ui-icon>
+            </ui-button>
+        </section>
+    </div>
+    <div v-else-if="parser.isHash">
+        <value-modifier v-for="psr in parser.hashKeyTypeParsers" :parser="psr" :ks="ks" :mode="mode+1" :val="parsedVal"></value-modifier>
+    </div>
+</ui-section>

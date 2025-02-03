@@ -1,0 +1,24 @@
+<%_
+const underline2Hump = str => str.replace(/\_(\w)/g, (_, char) => char.toUpperCase());
+
+for(let sheetName in interfaceDic) { -%>
+export interface <%- underline2Hump(`I_${sheetName}`) %> {
+<%_ for(let key in interfaceDic[sheetName]) { -%>
+    /** <%- annotationDic[sheetName][key] %> */
+    readonly <%- key %>: <%- interfaceDic[sheetName][key] %>;
+<%_ } -%>
+}
+<%_ } -%>
+
+export interface IGameData {
+    readonly config: IConfig;
+<%_ for(let sheetName in interfaceDic) { -%>
+    <%_ if(sheetName == 'config') continue; -%>
+    readonly <%- sheetName %>: { [_id: string]: <%- underline2Hump(`I_${sheetName}`) %> };
+<%_ } -%>
+}
+
+<%_ for(let sheetName in workbookData) { -%>
+    <%_ if(sheetName == 'config') continue; -%> 
+export type <%- underline2Hump(`T_${sheetName}Key`) %> = <%- '\'' + Object.keys(workbookData[sheetName]).join('\' | \'') + '\'' %>;
+<%_ } -%>

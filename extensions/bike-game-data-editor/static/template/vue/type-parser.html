@@ -1,0 +1,71 @@
+<ui-section class="type-parser config" v-if="!!parser" whole :style="{width: '100%',height: baseType == 'enum' || baseType == 'hash' ? 'auto' : '0px'}">
+    <div slot="header" class="header">
+        <ui-label v-if="mode == 0">类型</ui-label>
+        <ui-input v-if="mode != 0" :value="parser.TypeKey" @change="setTypeParser('typeKey', $event.target.value + '@' + parser.TypeMemo)" placeHolder="数字、字母以及下划线组合"></ui-input>
+        <ui-input v-if="mode != 0" :value="parser.TypeMemo" @change="setTypeParser('typeKey', parser.TypeKey + '@' + $event.target.value)" placeHolder="备注名" style="margin-left: 5px;"></ui-input>
+        <div>
+            <ui-select :value="baseType" @change="setBaseType($event.target.value)">
+                <option value="">请选择</option>
+                <option value="ignore">忽略</option>
+                <option value="number">数字</option>
+                <option value="string">字符串</option>
+                <option value="enum">枚举</option>
+                <option value="quot">引用</option>
+                <option value="hash">键值对</option>
+                <option value="grid">格子</option>
+                <option value="asset">资源</option>
+                <option value="color">颜色</option>
+                <option value="text">文本</option>
+            </ui-select>
+            <ui-num-input v-if="baseType == 'grid'" v-model="parser.gridSize[0]" placeholder="行" style="width: 40px;margin-right: 0px;"></ui-num-input>
+            <ui-label  v-if="baseType == 'grid'" style="margin: 0px;padding: 0px;">×</ui-label>
+            <ui-num-input v-if="baseType == 'grid'" v-model="parser.gridSize[1]" placeholder="列" style="width: 40px;margin-left: 0px;"></ui-num-input>
+            <ui-select v-if="baseType == 'quot'" :value="parser.type" @change="setTypeParser('type', $event.target.value)">
+                <option value="">请选择</option>
+                <option v-for="k in ksKeys" :value="k">{{ ks.memos[k] || k }}</option>
+            </ui-select>
+            <ui-checkbox v-if="baseType == 'enum'" :value="parser.isAutoEnum" @change="setTypeParser('isAutoEnum', $event.target.value)">自动生成</ui-checkbox>
+            <ui-checkbox v-if="!parser.isAutoEnum && !parser.isIgnore && !parser.isGrid && !parser.isAsset && !parser.isText" :value="parser.isArray" @change="setTypeParser('isArray', $event.target.value)">
+                数组
+            </ui-checkbox>
+            <ui-checkbox v-if="['string', 'text'].includes(baseType)" :value="parser.isTranslate" @change="setTypeParser('isTranslate', $event.target.value)">多语言</ui-checkbox>
+            <ui-checkbox v-if="baseType == 'hash'" :value="parser.isJSON" @change="setTypeParser('isJSON', $event.target.value)">
+                JSON
+            </ui-checkbox>
+            <ui-select v-if="baseType=='asset'" :value="parser.type" @change="setTypeParser('type', $event.target.value)">
+                <option value="">请选择</option>
+                <option value="ImageAsset">图片</option>
+                <option value="AnimationClip">动画</option>
+                <option value="ParticleAsset">粒子</option>
+                <option value="AudioClip">音声</option>
+                <option value="Prefab">预制体</option>
+            </ui-select>
+        </div>
+    </div>
+    <div v-if="baseType == 'enum' || baseType == 'hash'">
+        <section v-if="baseType == 'hash'">
+            <section v-for="(psr, idx) in parser.hashKeyTypeParsers">
+                <type-parser :parser="psr" :ks="ks" :mode="mode + 1"></type-parser>
+                <ui-button type="icon" style="margin-left: 2px;" @click="newTypeParser(idx)">
+                    <ui-icon value="add"></ui-icon>
+                </ui-button>
+                <ui-button type="icon" style="margin-left: 2px;" :disabled="parser.hashKeyTypeParsers.length < 2" @click="removeTypeParser(idx)">
+                    <ui-icon value="reduce"></ui-icon>
+                </ui-button>
+            </section>
+        </section>
+        <ui-label v-else-if="parser.isAutoEnum">&lt;自动生成&gt;</ui-label>
+        <section v-else>
+            <section v-for="(key, idx) in parser.enumKeys" style="margin-top:2px;">
+                <ui-input :value="key.split('@')[0]" style="flex: 1" @change="setEnumKey(idx, $event.target.value)" placeholder="数字、字母以及下划线组合"></ui-input>
+                <ui-input :value="key.split('@')[1]||''" @change="setEnumMemo(idx, $event.target.value)" placeholder="备注名"></ui-input>
+                <ui-button type="icon" style="margin-left: 2px;" @click="newEnumKey(idx)">
+                    <ui-icon value="add"></ui-icon>
+                </ui-button>
+                <ui-button type="icon" style="margin-left: 2px;" :disabled="parser.enumKeys.length < 2" @click="removeEnumKey(idx)">
+                    <ui-icon value="reduce"></ui-icon>
+                </ui-button>
+            </section>
+        </section>
+    </div>
+</ui-section>

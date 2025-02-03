@@ -9,17 +9,29 @@ export interface <%- underlineToHump('I_'+key) %> {
     readonly <%- param %>: <%- intfs[key][param] %>;
 <%_ } -%>
 }
+<%_ if (key.endsWith('config')) { %>
+export enum <%- underlineToHump('E_'+key) %> {
+<%_ for (let param in intfs[key]) { -%>
+    /** <%- annos[key][param] %> */
+    <%- param %>,
+<%_ } -%>
+}
+
 <%_ }
+}
 -%>
 
 export interface IGameData {
     readonly version: number;
-    readonly config: IConfig;
-<%_ for (let key in intfs) { if (key == 'config') continue; -%>
-    readonly <%- key %>: {[_id: string]: <%- underlineToHump('I_'+key) %>};
-<%_ } -%>
+<%_ for (let key in intfs) { if (key.endsWith('config')) { -%>
+    readonly <%- key %>: <%- underlineToHump('I_'+key) %>;
+<%_ } else { -%>
+    readonly <%- key %>: {readonly [_id: string]: <%- underlineToHump('I_'+key) %>};
+<%_ }
+} -%>
 }
 
 <%_ for (let type in list) { if (type == 'version') continue; -%>
 export type <%- underlineToHump('T_' + type + '_key') %> = <%- '\'' + Object.keys(list[type]).join('\' | \'') + '\'' %>;
 <%_ } -%>
+

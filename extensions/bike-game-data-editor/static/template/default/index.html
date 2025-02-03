@@ -1,0 +1,200 @@
+<div id="app" class="content">
+    <div class="top-bar">
+        <ui-label style="margin-right: 5px;">EXCEL</ui-label>
+        <ui-file type="directory" protocols="file" :value="path" @confirm="setEXCELPath($event.target.value)"></ui-file>
+        <ui-button type="primary" @click="importEXCEL" outline>
+            <ui-icon value="import"></ui-icon>
+            <ui-label>读取</ui-label>
+        </ui-button>
+        <ui-button type="warning" @click="combineExcel" outline>
+            <ui-icon value="import"></ui-icon>
+            <ui-label>合入</ui-label>
+        </ui-button>
+        <ui-button type="success" @click="saveEXCEL" outline>
+            <ui-icon value="export"></ui-icon>
+            <ui-label>保存</ui-label>
+        </ui-button>
+
+        <ui-label style="margin-left: 5px;margin-right: 5px;">JSON</ui-label>
+        <ui-file type="directory" protocols="file" :value="jsonpath" @confirm="setJSONPath($event.target.value)"></ui-file>
+        <ui-button type="primary" @click="importJSON" outline>
+            <ui-icon value="import"></ui-icon>
+            <ui-label>读取</ui-label>
+        </ui-button>
+        <ui-button type="success" @click="saveJSON" outline>
+            <ui-icon value="export"></ui-icon>
+            <ui-label>保存</ui-label>
+        </ui-button>
+
+        <section>
+            <ui-button type="danger" @click="removeFile" outline>
+                <ui-icon value="del"></ui-icon>
+                <ui-label>删除配置</ui-label>
+            </ui-button>
+            <ui-button type="primary" :disabled="parsed.length==0" @confirm="exportToProject" outline>
+                <ui-icon value="export"></ui-icon>
+                <ui-label>导入游戏</ui-label>
+            </ui-button>
+        </section>
+    </div>
+    <section>
+        <div class="slider">
+            <ul>
+                <li v-for="item in parsed.filter(item => !item.removed)" :active="file == item" @click="file == item ? renameFile() : selectFile(item)">
+                    <p :style="{marginBottom: '5px', color: duplicatedFileNames.includes(item.rename || item.name) ? 'red' : 'white'}">{{(item.memo || item.rename || item.name).split('#').pop()}}</p>
+                    <p>
+                        <ui-label v-for="pg in item.pages" :style="{color: duplicatedPageNames.includes(pg.name) || !!duplicatedKeys.find(ks => ks[0] == item.name && ks[1] == pg.name) || !!duplicatedRows.find(rs => rs[0] == item.name && rs[1] == pg.name) ? 'red' : '#0b0'}">{{item.pages[0].name == pg.name ? (pg.memo || pg.name) : ',' + (pg.memo || pg.name)}}</ui-label>
+                    </p>
+                </li>
+                <hr />
+                <li @click="newFile">
+                    <p><ui-icon value="add"></ui-icon>新建文件</p>
+                </li>
+            </ul>
+        </div>
+        <div class="main">
+            <div class="top">
+                <div class="slider" v-if="!!page && (!isConfigPage || editMode == 0)">
+                    <ul v-if="isConfigPage">
+                        <li v-for="(cfg, idx) in page.data.slice(3)" :active="rowIndex == idx" @click="rowIndex = idx">
+                            <p>{{cfg[1]}}</p>
+                            <p style="margin-top: 5px;color: #0b0;">{{cfg[0]}}</p>
+                        </li>
+                        <hr />
+                        <li @click="newConfig">
+                            <p><ui-icon value="add"></ui-icon>扩增配置</p>
+                        </li>
+                    </ul>
+                    <ul v-else-if="editMode == 0">
+                        <li v-for="(key, idx) in page.data[0]" :active="keyIndex == idx" @click="keyIndex = idx">
+                            <p>{{page.data[2][idx]}}</p>
+                            <p style="margin-top: 5px;color: #0b0;">{{key}}</p>
+                            
+                        </li>
+                        <hr />
+                        <li @click="newKey">
+                            <p><ui-icon value="add"></ui-icon>扩增表头</p>
+                        </li>
+                    </ul>
+                    <ul v-else-if="editMode == 1">
+                        <li v-for="(row, idx) in page.data.slice(4)" :active="rowIndex == idx" @click="rowIndex = idx">
+                            <p v-if="memoIndex != -1">{{row[memoIndex]}}</p>
+                            <p :style="{marginTop: memoIndex == -1 ? '0' : '5px', color:'#0b0'}">{{row[0]}}</p>
+                        </li>
+                        <hr />
+                        <li @click="newRow">
+                            <p><ui-icon value="add"></ui-icon>扩增表项</p>
+                        </li>
+                    </ul>
+                </div>
+                <div class="content" v-if="!!page">
+                    <div class="main" style="overflow-y: auto;" v-if="!!parser">
+                        <div v-if="editMode == 0">
+                            <ui-prop>
+                                <ui-label slot="label">字段</ui-label>
+                                <ui-input slot="content" :value="parser.TypeKey" :disabled="parser.TypeKey == '_id'" @change="parser.typeKey = $event.target.value + '@' + parser.TypeMemo"></ui-input>
+                            </ui-prop>
+                            
+                            <ui-prop v-if="!isConfigPage">
+                                <ui-label slot="label">名称</ui-label>
+                                <ui-input slot="content" :value="parser.TypeMemo" :disabled="parser.TypeKey == '_id'" @change="parser.typeKey = parser.TypeKey + '@' + $event.target.value"></ui-input>
+                            </ui-prop>
+
+                            <ui-prop>
+                                <ui-label slot="label">描述</ui-label>
+                                <ui-input v-if="isConfigPage" slot="content" v-model="page.data[rowIndex + 3][1]"></ui-input>
+                                <ui-textarea v-else slot="content" v-model="page.data[3][keyIndex]"></ui-textarea>
+                            </ui-prop>
+
+                            <type-parser v-if="parser && parser.TypeKey != '_id'" :parser="parser" :ks="ks"></type-parser>
+                        </div>
+                        <div v-else-if="editMode==1">
+                            <!-- <p v-for="parser in parsers">{{parser.typeKey + ':' + parser.encodedValue }}</p>
+                            <p v-for="parser in parsers">{{parser.typeKey + ':' + JSON.stringify(parser.parsedValue) }}</p> -->
+                            <value-modifier v-for="parser in parsers" :parser="parser" :ks="ks"></value-modifier>
+                        </div>
+                    </div>
+                    <div class="bottom" v-if="!!page">
+                        <div v-if="editMode == 0 || !isConfigPage">
+                            <ui-button :disabled="!canMoveUp" @confirm="isConfigPage ? moveConfig(-1) : editMode == 0 ? moveKey(-1) : editMode == 1 ? moveRow(-1) : null" outline>上移此项</ui-button>
+                            <ui-button :disabled="!canMoveDown" @confirm="isConfigPage ? moveConfig(1) : editMode == 0 ? moveKey(1) : editMode == 1 ? moveRow(1) : null" outline>下移此项</ui-button>
+                            <ui-button :disabled="!canRemove" type="danger" @confirm="isConfigPage ? removeConfig() : editMode == 0 ? removeKey() : editMode == 1 ? removeRow() : ''" outline>删除此项</ui-button>
+                        </div>
+                        <section>
+                            <ui-tab :value="editMode" @change="selectEditMode(+$event.target.value)" style="width: 400px;">
+                                <ui-button>编辑表头</ui-button>
+                                <ui-button>编辑表项</ui-button>
+                            </ui-tab>
+                        </section>
+                    </div>
+                </div>
+            </div>
+            <div class="bottom" v-if="!!file">
+                <ui-label>表页：</ui-label>
+                <ui-tab :value="file.pages.indexOf(page)" @change="selectPage(+$event.target.value)">
+                    <ui-button v-for="pg in file.pages"><ui-label :style="duplicatedPageNames.includes(pg.name) || !!duplicatedKeys.find(ks => ks[0] == file.name && ks[1] == pg.name) || !!duplicatedRows.find(rs => rs[0] == file.name && rs[1] == pg.name) ? {color: 'red'} : null">{{pg.memo || pg.name}}</ui-label></ui-button>
+                </ui-tab>
+                <section>
+                    <ui-button type="default" @confirm="newPage" outline>新建表页</ui-button>
+                    <ui-button type="danger" @confirm="removePage" :disabled="file.pages.length <= 1" outline>删除表页</ui-button>
+                </section>
+            </div>
+        </div>
+    </section>
+    <div class="modal" v-if="modal.show">
+        <div class="panel" :style="{height: this.modal.height + 'px'}">
+            <div class="title-bar">
+                <ui-label class="title">{{modal.title}}</ui-label>
+                <ui-button type="danger" class="close-btn" @click="modalClose">
+                    <ui-icon value="close"></ui-icon>
+                </ui-button>
+            </div>
+            <div class="content">
+                <div class="main">
+                    <div v-if="['new-file', 'rename-file'].includes(modal.type)">
+                        <ui-prop message="由大小写字母和数字组成，不要用数字开头">
+                            <ui-label slot="label">文件名</ui-label>
+                            <ui-input slot="content" placeholder="由大小写字母和数字组成，不要用数字开头" :value="modal.values[0]||''" @change="modal.values[0]=$event.target.value"></ui-input>
+                        </ui-prop>
+                        <ui-prop style="margin-top: 5px;" message="可设置 数字# 前缀调整排序">
+                            <ui-label slot="label">备注名</ui-label>
+                            <ui-input slot="content" placeholder="不要过长，不要混杂@符号" :value="modal.values[1]" @change="modal.values[1]=$event.target.value"></ui-input>
+                        </ui-prop>
+                        <ui-prop v-if="modal.type == 'new-file'" message="由小写字母、数字及下划线组成，不要用数字或下划线开头，不小于两个字符" style="margin-top: 5px;">
+                            <ui-label slot="label">表页名</ui-label>
+                            <ui-input slot="content" placeholder="由小写字母、数字及下划线组成，不要用数字或下划线开头，不小于两个字符" :value="modal.values[2]||''" @change="modal.values[2]=$event.target.value"></ui-input>
+                        </ui-prop>
+                    </div>
+                    <div v-if="['new-page', 'rename-page'].includes(modal.type)">
+                        <ui-prop message="由小写字母、数字及下划线组成，不要用数字或下划线开头，不小于两个字符">
+                            <ui-label slot="label">表页名</ui-label>
+                            <ui-input slot="content" placeholder="由小写字母、数字及下划线组成，不要用数字或下划线开头，不小于两个字符" :value="modal.values[0]||''" @change="modal.values[0]=$event.target.value"></ui-input>
+                        </ui-prop>
+                        <ui-prop style="margin-top: 5px;">
+                            <ui-label slot="label">备注名</ui-label>
+                            <ui-input slot="content" placeholder="不要过长，不要混杂@符号" v-model="modal.values[1]"></ui-input>
+                        </ui-prop>
+
+                        <ui-prop v-if="modal.type == 'rename-page'" style="margin-top: 10px;">
+                            <ui-label slot="label">文件转移</ui-label>
+                            <ui-select slot="content" :value="modal.values[2]" :disabled="file.pages.length < 2 || modal.values[3] != file.pages.indexOf(page)" @change="modal.values[2] = $event.target.value">
+                                <option v-for="item in parsed" :value="item.name">{{item.rename || item.name}}</option>
+                            </ui-select>
+                        </ui-prop>
+
+                        <ui-prop v-if="modal.type == 'rename-page'" style="margin-top: 10px;">
+                            <ui-label slot="label">序列调整</ui-label>
+                            <ui-select slot="content" :value="modal.values[3]" :disabled="file.pages.length < 2 || modal.values[2] != file.name" @change="modal.values[3] = +$event.target.value">
+                                <option v-for="(pg, idx) in file.pages" :value="idx">序列{{idx}}</option>
+                            </ui-select>
+                        </ui-prop>
+                    </div>
+                </div>
+                <div class="bottom">
+                    <ui-button @click="modalOk">确定</ui-button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="visibility: hidden;position: absolute;">{{ updatedPage }}</div>
+</div>

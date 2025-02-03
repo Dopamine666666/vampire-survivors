@@ -1,0 +1,344 @@
+body, ul, h1, h2, h3, h4, h5, h6, p { margin: 0; padding: 0; }
+li { list-style: none; }
+:host { display: block; position: relative; overflow: hidden; box-sizing: border-box; outline: none; }
+:host([hidden]) { display: none; }
+#creator-resizer { border: none; position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; pointer-events: none; visibility: hidden; }
+
+:host {
+  font-family: var(--font-normal);
+}
+::-webkit-scrollbar {
+  height: calc(var(--size-normal-font) * 1px);
+  width: calc(var(--size-normal-font) * 1px);
+}
+::-webkit-scrollbar-thumb {
+  border-radius: calc(var(--size-normal-radius) * 2px);
+  border: calc(var(--size-normal-font) * 0.25px) solid transparent;
+  background-color: var(--color-active-fill);
+  background-clip: content-box;
+  transition: background-color 0.3s;
+}
+::-webkit-scrollbar-thumb:hover {
+  border: calc(var(--size-normal-font) * 0.25px) solid transparent;
+  background-color: var(--color-active-fill-weakest);
+  background-clip: content-box;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-track:hover {
+  background: transparent;
+}
+::-webkit-scrollbar-corner {
+  display: none;
+}
+::-webkit-scrollbar-button {
+  display: none;
+}
+:host {
+  flex: 1;
+  display: flex;
+}
+:host > .content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: text;
+}
+:host > .content > header {
+  display: none;
+  margin: 10px 28px;
+}
+:host > .content > .top-bar {
+  display: flex;
+  margin: 10px 10px 0px 10px;
+  padding: 5px 5px;
+  border: 1px solid var(--color-normal-border-weaker);
+  border-radius: calc(var(--size-normal-radius) * 1px);
+  background-color: #222;
+}
+:host > .content > .top-bar > ui-tab {
+  margin-right: 10px;
+}
+:host > .content > .top-bar > ui-select,
+:host > .content > .top-bar > ui-button {
+  margin-right: 2px;
+}
+:host > .content > .top-bar > section {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+:host > .content > .top-bar > section > ui-button {
+  margin-left: 5px;
+}
+:host > .content > section {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  padding: 5px 10px 10px 10px;
+}
+
+.slider {
+  width: 200px;
+  border: 1px solid var(--color-normal-border-weaker);
+  border-radius: calc(var(--size-normal-radius) * 1px);
+  overflow-y: auto;
+  background-color: var(--color-normal-fill-emphasis);
+}
+
+.slider::-webkit-scrollbar {
+  display: block;
+  border-left: 1px solid var(--color-normal-border-weaker);
+}
+
+.slider > ul > li {
+  cursor: pointer;
+  transition: background-color 0.2s;
+  padding: 3px 8px;
+  margin: 2px 2px;
+  text-align: left;
+  border: 1px solid #666;
+  border-radius: 4px;
+}
+
+.slider > ul > hr {
+    border: 0.5px solid #666;
+    margin: 5px 0px;
+}
+
+.slider > ul > li > p {
+    word-wrap: break-word;
+    line-height: 110%;
+}
+
+.slider > ul > li:hover,
+.slider > ul > li[active=true] {
+  background-color: var(--color-active-fill-emphasis);
+  color: var(--color-active-contrast-emphasis);
+}
+
+.slider > ul > li[invalid=true] {
+  color: red;
+}
+
+.slider > ul > li[is-main=true] {
+  color:goldenrod;
+}
+
+:host > .content > section > .main {
+  flex: 1;
+  margin-left: 6px;
+  padding: 0 0;
+  border: 1px solid var(--color-normal-border-weaker);
+  border-radius: calc(var(--size-normal-radius) * 1px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+:host > .content > section > .main > .top {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  overflow: auto;
+  padding: 0 0;
+}
+
+:host > .content > section > .main > .top > .slider {
+    width: 200px;
+}
+
+:host > .content > section > .main > .top > .content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+:host > .content > section > .main > .top > .content > .main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 10px;
+}
+
+:host > .content > section > .main > .top > .content > .main > div > ui-prop {
+    margin-bottom: 10px;
+}
+
+:host > .content > section > .main > .top > .content > .bottom {
+    border-top: calc(var(--size-normal-border) * 1px) solid var(--color-normal-border-weaker);
+    padding: 10px 10px 0px 10px;
+    display: flex;
+    height: 30px;
+    flex-direction: row;
+    background-color: #222;
+}
+
+:host > .content > section > .main > .top > .content > .bottom > ui-tab {
+    width: 200px;
+}
+
+:host > .content > section > .main > .top > .content > .bottom > section {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+:host > .content > section > .main > .top > .content > .bottom > ui-button {
+    margin-left: 5px;
+}
+
+:host > .content > section > .main > .bottom {
+    border-top: calc(var(--size-normal-border) * 1px) solid var(--color-normal-border-weaker);
+    padding: 10px 10px 0px 10px;
+    display: flex;
+    height: 30px;
+    background-color: #222;
+  }
+  
+  :host > .content > section > .main > .bottom > ui-tab {
+    margin-right: 10px;
+  }
+  :host > .content > section > .main > .bottom > section {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  :host > .content > section > .main > .bottom > ui-checkbox,
+  :host > .content > section > .main > .bottom > ui-button {
+    margin-right: 5px;
+  }
+  
+  :host > .content > section > .main > .bottom > section > ui-checkbox {
+    margin-right: 20px;
+  }
+
+  :host > .content > section > .main > .bottom > section > ui-tab,
+  :host > .content > section > .main > .bottom > section > ui-button {
+    margin-left: 5px;
+  }
+  
+:host > .content > .modal {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    /* visibility: hidden; */
+}
+
+:host > .content > .modal > .panel {
+    display: flex;
+    width: 60%;
+    height: 130px;
+    background-color: #222;
+    border-radius: 8px;
+    flex-direction: column;
+}
+
+:host > .content > .modal > .panel > .title-bar {
+    display: flex;
+    width: 100%;
+    height: 30px;
+    flex: 0 0 auto;
+    background-color: #fff;
+    border-radius: 8px 8px 0 0;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+:host > .content > .modal > .panel > .title-bar > .title {
+    color: black;
+    padding: 5px 10px;
+}
+
+:host > .content > .modal > .panel > .title-bar > .close-btn {
+    height: 100%;
+    border-radius: 0 8px 0 0;
+    width: 40px;
+}
+
+:host > .content > .modal > .panel > .content {
+    display: flex;
+    flex: 1 1 auto;
+    border: 1px solid black;
+    border-radius: 0 0 8px 8px;
+    flex-direction: column;
+}
+
+:host > .content > .modal > .panel > .content > .main {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    padding: 10px;
+}
+
+:host > .content > .modal > .panel > .content > .bottom {
+    border-top: calc(var(--size-normal-border) * 1px) solid var(--color-normal-border-weaker);
+    padding-top: 10px;
+    display: flex;
+    height: 30px;
+    flex-direction: row;
+    justify-content: center;
+}
+
+:host > .content > .modal > .panel > .content > .bottom > ui-button {
+    width: 100px;
+}
+
+.type-parser {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    height: 0px;
+    min-height: 22px;
+}
+
+.type-parser > .header {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    padding-left: 5px;
+}
+
+.type-parser > .header > ui-label {
+    width: 150px;
+}
+
+.type-parser > .header > div {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.type-parser > .header > div > ui-input,
+.type-parser > .header > div > ui-num-input,
+.type-parser > .header > div > ui-select,
+.type-parser > .header > div > ui-checkbox {
+    margin-right: 10px;
+}
+
+.type-parser > div > section {
+    display: flex;
+    flex-direction: column;
+    margin: 0px;
+}
+
+.type-parser > div > section > section {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.list-item {
+    flex: 1 1 auto;
+    width:100%;
+    margin-top: 2px;
+}

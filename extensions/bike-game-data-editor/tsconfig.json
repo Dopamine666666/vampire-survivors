@@ -1,0 +1,13 @@
+{
+    "extends": "./base.tsconfig.json",
+    "compilerOptions": {
+        "outDir": "./dist",
+        "rootDir": "./source",
+        "types": [
+            "node",
+            "@cocos/creator-types/editor",
+        ],
+        "target": "ES2017",
+        "module": "CommonJS"
+    }
+}
